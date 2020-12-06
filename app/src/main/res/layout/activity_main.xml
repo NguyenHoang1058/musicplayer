@@ -62,5 +62,6 @@
             android:layout_weight="1"
             app:srcCompat="@drawable/ic_fast_forward"
             tools:ignore="VectorDrawableCompat" />
+
     </LinearLayout>
 </LinearLayout>

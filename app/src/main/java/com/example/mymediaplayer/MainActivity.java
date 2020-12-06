@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
     private MyService myService;
     private boolean isBound = false;
     private ServiceConnection connection;
+    private boolean isPause = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,8 +55,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(isBound){
-                    unbindService(connection);
-                    isBound = false;
+                    myService.pause();
+                    isPause = true;
                 }
             }
         });
@@ -66,7 +67,18 @@ public class MainActivity extends AppCompatActivity {
                     myService.fastForward();
                 }
                 else {
-                    Toast.makeText(MainActivity.this, "Service inactive", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Service inactived", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        bt_backward.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(isBound){
+                    myService.fastBackward();
+                }
+                else {
+                    Toast.makeText(MainActivity.this, "Service inactived", Toast.LENGTH_SHORT).show();
                 }
             }
         });

@@ -11,6 +11,9 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MyService extends Service {
 private MyMediaPlayer player;
 private IBinder binder;
@@ -28,9 +31,8 @@ private IBinder binder;
         player.stop();
         return super.onUnbind(intent);
     }
-    public void fastForward(){
-        player.forward(6000);
-    }
+    public void fastForward(){player.forward(10000);}
+    public void fastBackward(){player.backward(10000);}
     public void pause(){
         player.pause();
     }
@@ -48,22 +50,63 @@ private IBinder binder;
 }
 class MyMediaPlayer {
     private MediaPlayer mediaPlayer;
+    private List<Integer> songList = new ArrayList<>();
+    private int currentSong = 0;
 
     public MyMediaPlayer(Context context){
-        mediaPlayer = MediaPlayer.create(context, R.raw.song);
-        mediaPlayer.setLooping(true);
+        songList.add(R.raw.song);
+        songList.add(R.raw.song2);
+        songList.add(R.raw.song3);
+        songList.add(R.raw.song4);
+        if(songList.size() > 1){
+            currentSong = 0;
+            mediaPlayer = MediaPlayer.create(context, songList.get(currentSong + 0));
+            currentSong = currentSong + 1;
+            mediaPlayer.start();
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    mediaPlayer = MediaPlayer.create(context, songList.get(currentSong));
+                    mediaPlayer.start();
+                }
+            });
+        }
     }
 
     //forward
     public void forward(int msec){
-        mediaPlayer.seekTo(msec);
+        int currPos = mediaPlayer.getCurrentPosition();
+        if(currPos + msec <= mediaPlayer.getDuration()){
+            mediaPlayer.seekTo(msec + currPos);
+        }
+        else {
+            mediaPlayer.seekTo(mediaPlayer.getDuration());
+        }
+    }
+
+    //backward
+    public void backward(int msec){
+        int currPos = mediaPlayer.getCurrentPosition();
+        if(currPos - msec >= 0){
+            mediaPlayer.seekTo(currPos - msec);
+        }
+        else {
+            mediaPlayer.seekTo(0);
+        }
     }
 
     //pause music
     public void pause(){
-        mediaPlayer.pause();
-    }
+        if (mediaPlayer.isPlaying()){
+            mediaPlayer.pause();
+        }
+        else {
+            int currPos = mediaPlayer.getCurrentPosition();
+            mediaPlayer.seekTo(currPos);
+            mediaPlayer.start();
+        }
 
+    }
     //play music
     public void play(){
         if(mediaPlayer != null)
